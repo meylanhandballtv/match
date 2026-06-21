@@ -1,7 +1,7 @@
 {
   "homeName": "MEYLAN",
   "awayName": "GSMH",
-  "homeScore": 0,
+  "homeScore": 1,
   "awayScore": 0,
   "homeSanctions": {
     "yellow": 0,
@@ -18,15 +18,15 @@
     "min2": 0
   },
   "timer": {
-    "running": true,
-    "seconds": 0,
+    "running": false,
+    "seconds": 7,
     "direction": "up",
     "lastSync": 1782077957345
   },
   "period": 1,
   "timeoutActive": true,
   "visible": true,
-  "rev": 22,
+  "rev": 24,
   "updatedBy": "control_zpa2gntt",
-  "updatedAt": 1782077957346
+  "updatedAt": 1782078015994
 }
