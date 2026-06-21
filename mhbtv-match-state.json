@@ -18,15 +18,15 @@
     "min2": 0
   },
   "timer": {
-    "running": true,
-    "seconds": 0,
+    "running": false,
+    "seconds": 116,
     "direction": "up",
-    "lastSync": 1782077705864
+    "lastSync": 1782077819681
   },
   "period": 1,
   "timeoutActive": true,
   "visible": true,
-  "rev": 18,
+  "rev": 19,
   "updatedBy": "control_zpa2gntt",
-  "updatedAt": 1782077705865
+  "updatedAt": 1782077823352
 }
