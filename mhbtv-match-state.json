@@ -1,0 +1,32 @@
+{
+  "homeName": "DOMICILE",
+  "awayName": "EXTÉRIEUR",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeSanctions": {
+    "yellow": 0,
+    "red": 0,
+    "blue": 0,
+    "white": 0,
+    "min2": 0
+  },
+  "awaySanctions": {
+    "yellow": 0,
+    "red": 0,
+    "blue": 0,
+    "white": 0,
+    "min2": 0
+  },
+  "timer": {
+    "running": false,
+    "seconds": 4,
+    "direction": "up",
+    "lastSync": 1782061138163
+  },
+  "period": 1,
+  "timeoutActive": false,
+  "visible": true,
+  "rev": 14,
+  "updatedBy": "client_scyke28i",
+  "updatedAt": 1782077560169
+}
