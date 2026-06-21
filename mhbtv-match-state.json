@@ -1,0 +1,32 @@
+{
+  "homeName": "DOMICILE",
+  "awayName": "EXTÉRIEUR",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeSanctions": {
+    "yellow": 0,
+    "red": 0,
+    "blue": 0,
+    "white": 0,
+    "min2": 0
+  },
+  "awaySanctions": {
+    "yellow": 0,
+    "red": 0,
+    "blue": 0,
+    "white": 0,
+    "min2": 0
+  },
+  "timer": {
+    "running": false,
+    "seconds": 0,
+    "direction": "up",
+    "lastSync": 1782060982434
+  },
+  "period": 1,
+  "timeoutActive": false,
+  "visible": true,
+  "rev": 1,
+  "updatedBy": "client_fomc75iu",
+  "updatedAt": 1782061008241
+}
