@@ -2,7 +2,7 @@
   "homeName": "DOMICILE",
   "awayName": "EXTÉRIEUR",
   "homeScore": 0,
-  "awayScore": 0,
+  "awayScore": 1,
   "homeSanctions": {
     "yellow": 0,
     "red": 0,
@@ -26,7 +26,7 @@
   "period": 1,
   "timeoutActive": false,
   "visible": true,
-  "rev": 8,
-  "updatedBy": "client_fomc75iu",
-  "updatedAt": 1782061142432
+  "rev": 9,
+  "updatedBy": "client_5xrz57ic",
+  "updatedAt": 1782061265039
 }
