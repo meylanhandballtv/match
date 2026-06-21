@@ -2,7 +2,7 @@
   "homeName": "MEYLAN",
   "awayName": "GSMH",
   "homeScore": 1,
-  "awayScore": 0,
+  "awayScore": 1,
   "homeSanctions": {
     "yellow": 0,
     "red": 0,
@@ -19,14 +19,14 @@
   },
   "timer": {
     "running": true,
-    "seconds": 146,
+    "seconds": 180,
     "direction": "up",
     "lastSync": 1782080495303
   },
   "period": 1,
   "timeoutActive": true,
   "visible": true,
-  "rev": 27,
+  "rev": 28,
   "updatedBy": "control_wp36q6a3",
-  "updatedAt": 1782080495304
+  "updatedAt": 1782080529326
 }
