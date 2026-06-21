@@ -19,14 +19,14 @@
   },
   "timer": {
     "running": false,
-    "seconds": 296,
+    "seconds": 301,
     "direction": "up",
-    "lastSync": 1782080608224
+    "lastSync": 1782080721615
   },
   "period": 1,
   "timeoutActive": true,
   "visible": true,
-  "rev": 33,
+  "rev": 35,
   "updatedBy": "control_wp36q6a3",
-  "updatedAt": 1782080702379
+  "updatedAt": 1782080730121
 }
