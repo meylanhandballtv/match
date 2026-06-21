@@ -4,7 +4,7 @@
   "homeScore": 1,
   "awayScore": 3,
   "homeSanctions": {
-    "yellow": 0,
+    "yellow": 1,
     "red": 0,
     "blue": 0,
     "white": 0,
@@ -26,7 +26,7 @@
   "period": 1,
   "timeoutActive": true,
   "visible": true,
-  "rev": 32,
+  "rev": 33,
   "updatedBy": "control_wp36q6a3",
-  "updatedAt": 1782080614063
+  "updatedAt": 1782080702379
 }
