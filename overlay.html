@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>MHBTV – Overlay (OBS)</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: #00FF00;
+    font-family: 'Barlow Condensed', sans-serif;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ── SCOREBOARD ── */
+  #scoreboard {
+    position: absolute;
+    bottom: 48px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: stretch;
+    height: 72px;
+    filter: drop-shadow(0 4px 18px rgba(0,0,0,0.55));
+    transition: opacity 0.3s ease;
+  }
+  #scoreboard.hidden { opacity: 0; }
+
+  .team-block {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 22px;
+    background: rgba(10, 10, 10, 0.92);
+    min-width: 220px;
+  }
+  .team-block.away { flex-direction: row-reverse; }
+
+  .team-name {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    color: #FFFFFF;
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .sanctions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    justify-content: center;
+  }
+  .sanction-row { display: flex; gap: 4px; align-items: center; }
+
+  .card {
+    width: 14px; height: 18px;
+    border-radius: 2px;
+    font-size: 9px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    font-family: 'Barlow Condensed', sans-serif;
+  }
+  .card.yellow { background: #F5C518; }
+  .card.red    { background: #E02020; color: #fff; }
+  .card.blue   { background: #1565C0; color: #fff; }
+  .card.white  { background: #FFFFFF; border: 1px solid #888; }
+
+  .suspension-badge {
+    background: rgba(230,60,60,0.9);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    letter-spacing: 0.03em;
+  }
+
+  #score-center {
+    display: flex;
+    align-items: center;
+    background: #C8001E;
+    padding: 0 4px;
+  }
+  .score-digit {
+    font-size: 52px;
+    font-weight: 900;
+    color: #FFFFFF;
+    line-height: 1;
+    padding: 0 18px;
+    letter-spacing: -0.01em;
+  }
+  .score-sep {
+    font-size: 40px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.6);
+    line-height: 1;
+    padding-bottom: 4px;
+  }
+
+  #time-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(10,10,10,0.92);
+    padding: 0 20px;
+    min-width: 90px;
+    border-left: 2px solid #C8001E;
+  }
+  #time-display {
+    font-size: 26px;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+  #period-display {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 3px;
+  }
+
+  /* ── TIMEOUT BANNER ── */
+  #timeout-banner {
+    position: absolute;
+    top: 38px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10,10,10,0.92);
+    border-left: 4px solid #C8001E;
+    padding: 10px 28px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
+  }
+  #timeout-banner.visible { opacity: 1; }
+  #timeout-label {
+    font-size: 18px; font-weight: 900; color: #C8001E;
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  #timeout-team { font-size: 18px; font-weight: 600; color: #FFFFFF; letter-spacing: 0.04em; }
+  #timeout-timer { font-size: 18px; font-weight: 700; color: #FFFFFF; margin-left: 8px; }
+
+  /* ── GOAL FLASH ── */
+  #goal-flash {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(10,10,10,0.92);
+    border: 2px solid #C8001E;
+    padding: 22px 56px;
+    text-align: center;
+    opacity: 0;
+    filter: drop-shadow(0 6px 24px rgba(0,0,0,0.7));
+    transition: opacity 0.25s ease;
+  }
+  #goal-flash.show { opacity: 1; }
+  #goal-flash-label {
+    font-size: 52px; font-weight: 900; color: #C8001E;
+    text-transform: uppercase; letter-spacing: 0.12em; line-height: 1;
+  }
+  #goal-flash-team {
+    font-size: 22px; font-weight: 600; color: rgba(255,255,255,0.8);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-top: 6px;
+  }
+
+  /* ── EVENT TICKER ── */
+  #event-ticker {
+    position: absolute;
+    bottom: 130px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10,10,10,0.88);
+    border-left: 3px solid #C8001E;
+    padding: 7px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.85);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  #event-ticker.visible { opacity: 1; }
+
+  /* ── ÉCRAN DE CONFIGURATION (si pas encore configuré) ── */
+  #config-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+  #config-box {
+    background: #1A1A1A;
+    border: 2px solid #C8001E;
+    border-radius: 8px;
+    padding: 40px 50px;
+    max-width: 700px;
+    font-family: 'Barlow', sans-serif;
+    color: #F0F0F0;
+  }
+  #config-box h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 26px;
+    font-weight: 900;
+    color: #C8001E;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  #config-box p { font-size: 15px; line-height: 1.6; color: #ccc; margin-bottom: 16px; }
+  #config-box label { display:block; font-size: 13px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#888; margin-bottom:6px; margin-top:14px; }
+  #config-box input {
+    width: 100%;
+    background: #242424;
+    border: 1px solid #2E2E2E;
+    border-radius: 4px;
+    color: #F0F0F0;
+    font-size: 16px;
+    padding: 10px 14px;
+    outline: none;
+  }
+  #config-box input:focus { border-color: #C8001E; }
+  #config-box button {
+    margin-top: 20px;
+    background: #C8001E;
+    border: none;
+    color: #fff;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 12px 26px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  #config-box button:hover { background: #8f0015; }
+  #config-error { color: #E02020; font-size: 13px; margin-top: 10px; min-height: 18px; }
+
+  /* ── PASTILLE DE STATUT (coin haut-droit, discrète) ── */
+  #sync-dot {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.3);
+    z-index: 10000;
+  }
+  #sync-dot.ok   { background: #2E7D32; }
+  #sync-dot.fail { background: #C8001E; }
+</style>
+</head>
+<body>
+
+<!-- ÉCRAN DE CONFIGURATION (masqué une fois connecté) -->
+<div id="config-overlay">
+  <div id="config-box">
+    <h2>MHBTV — Configuration Overlay</h2>
+    <p>
+      Renseigne le même repo GitHub que celui utilisé dans <strong>control.html</strong>.
+      Cette page se met à jour automatiquement en lisant le fichier d'état toutes les 3 à 5 secondes.
+    </p>
+    <label>Repo (owner/repo)</label>
+    <input id="cfg-repo" type="text" placeholder="xavierfini/plateforme">
+    <label>Branche</label>
+    <input id="cfg-branch" type="text" placeholder="main" value="main">
+    <label>Chemin du fichier d'état</label>
+    <input id="cfg-path" type="text" placeholder="mhbtv-match-state.json" value="mhbtv-match-state.json">
+    <label>Personal Access Token (lecture suffisante)</label>
+    <input id="cfg-token" type="password" placeholder="github_pat_...">
+    <button id="btn-save-config">Connecter l'overlay</button>
+    <div id="config-error"></div>
+  </div>
+</div>
+
+<!-- PASTILLE DE STATUT -->
+<div id="sync-dot"></div>
+
+<!-- GOAL FLASH -->
+<div id="goal-flash">
+  <div id="goal-flash-label">BUT !</div>
+  <div id="goal-flash-team"></div>
+</div>
+
+<!-- TIMEOUT BANNER -->
+<div id="timeout-banner">
+  <span id="timeout-label">TEMPS MORT</span>
+  <span id="timeout-team"></span>
+  <span id="timeout-timer"></span>
+</div>
+
+<!-- EVENT TICKER -->
+<div id="event-ticker"></div>
+
+<!-- SCOREBOARD -->
+<div id="scoreboard">
+  <div class="team-block home">
+    <div class="sanctions" id="sanctions-home"></div>
+    <div class="team-name" id="team-home">DOMICILE</div>
+  </div>
+  <div id="score-center">
+    <span class="score-digit" id="score-home">0</span>
+    <span class="score-sep">:</span>
+    <span class="score-digit" id="score-away">0</span>
+  </div>
+  <div class="team-block away">
+    <div class="team-name" id="team-away">EXTÉRIEUR</div>
+    <div class="sanctions" id="sanctions-away"></div>
+  </div>
+  <div id="time-block">
+    <div id="time-display">00:00</div>
+    <div id="period-display">1ère MT</div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  MHBTV — Overlay OBS (lecture seule)
+//  Lit l'état du match depuis un fichier JSON sur GitHub,
+//  en polling toutes les 3 à 5 secondes. N'écrit jamais.
+// ══════════════════════════════════════════
+
+const CONFIG_KEY = 'mhbtv_github_config_v1'; // même clé que control.html → si ouverts dans le même navigateur, la config est déjà partagée
+
+function defaultState() {
+  return {
+    homeName: 'DOMICILE',
+    awayName: 'EXTÉRIEUR',
+    homeScore: 0,
+    awayScore: 0,
+    homeSanctions: { yellow: 0, red: 0, blue: 0, white: 0, min2: 0 },
+    awaySanctions: { yellow: 0, red: 0, blue: 0, white: 0, min2: 0 },
+    timer: { running: false, seconds: 0, direction: 'up', lastSync: Date.now() },
+    period: 1,
+    timeoutActive: false,
+    visible: true,
+    rev: 0,
+    updatedBy: '',
+    updatedAt: Date.now(),
+  };
+}
+
+function mergeWithDefaults(parsed) {
+  const d = defaultState();
+  return { ...d, ...parsed,
+    homeSanctions: { ...d.homeSanctions, ...(parsed.homeSanctions || {}) },
+    awaySanctions: { ...d.awaySanctions, ...(parsed.awaySanctions || {}) },
+    timer: { ...d.timer, ...(parsed.timer || {}) },
+  };
+}
+
+let state = defaultState();
+let cfg = { repo: '', branch: 'main', path: 'mhbtv-match-state.json', token: '' };
+let _pollTimer = null;
+let _lastRev = -1;
+
+let _timerInterval   = null;
+let _timeoutInterval = null;
+let _timeoutSeconds  = 60;
+let _goalFlashTO     = null;
+let _tickerTO        = null;
+
+// ══════════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════════
+function loadConfig() {
+  try {
+    const raw = localStorage.getItem(CONFIG_KEY);
+    if (raw) cfg = { ...cfg, ...JSON.parse(raw) };
+  } catch (e) { /* ignore */ }
+}
+
+function saveConfig() {
+  localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
+}
+
+function configReady() {
+  return !!(cfg.repo && cfg.token && cfg.path);
+}
+
+function apiUrl() {
+  return `https://api.github.com/repos/${cfg.repo}/contents/${encodeURIComponent(cfg.path)}?ref=${encodeURIComponent(cfg.branch || 'main')}`;
+}
+
+function b64DecodeUnicode(str) {
+  return decodeURIComponent(escape(atob(str)));
+}
+
+async function githubFetchState() {
+  const res = await fetch(apiUrl(), {
+    headers: {
+      'Authorization': `Bearer ${cfg.token}`,
+      'Accept': 'application/vnd.github+json',
+    },
+  });
+  if (res.status === 404) return null; // pas encore créé côté control.html
+  if (!res.ok) throw new Error(`GitHub GET ${res.status}`);
+  const json = await res.json();
+  const decoded = b64DecodeUnicode(json.content.replace(/\n/g, ''));
+  return mergeWithDefaults(JSON.parse(decoded));
+}
+
+// ══════════════════════════════════════════
+//  RENDER
+// ══════════════════════════════════════════
+function render() {
+  document.getElementById('score-home').textContent = state.homeScore;
+  document.getElementById('score-away').textContent = state.awayScore;
+  document.getElementById('team-home').textContent  = state.homeName;
+  document.getElementById('team-away').textContent  = state.awayName;
+  renderSanctions('home');
+  renderSanctions('away');
+  updatePeriodLabel();
+  document.getElementById('scoreboard').classList.toggle('hidden', !state.visible);
+}
+
+function renderSanctions(side) {
+  const s  = side === 'home' ? state.homeSanctions : state.awaySanctions;
+  const el = document.getElementById('sanctions-' + side);
+  el.innerHTML = '';
+
+  const row1 = document.createElement('div');
+  row1.className = 'sanction-row';
+  for (let i = 0; i < s.yellow; i++) row1.appendChild(makeCard('yellow', 'J'));
+  for (let i = 0; i < s.red;    i++) row1.appendChild(makeCard('red',    'R'));
+  for (let i = 0; i < s.blue;   i++) row1.appendChild(makeCard('blue',   'B'));
+  for (let i = 0; i < s.white;  i++) row1.appendChild(makeCard('white',  'D'));
+
+  const row2 = document.createElement('div');
+  row2.className = 'sanction-row';
+  for (let i = 0; i < s.min2; i++) {
+    const b = document.createElement('span');
+    b.className = 'suspension-badge';
+    b.textContent = '2\'';
+    row2.appendChild(b);
+  }
+  el.appendChild(row1);
+  el.appendChild(row2);
+}
+
+function makeCard(type, letter) {
+  const d = document.createElement('div');
+  d.className = 'card ' + type;
+  d.textContent = letter;
+  return d;
+}
+
+function updatePeriodLabel() {
+  const labels = { 1: '1ère MT', 2: '2ème MT', 3: 'Prolong.' };
+  document.getElementById('period-display').textContent = labels[state.period] || '';
+}
+
+function formatTime(s) {
+  const m   = Math.floor(Math.abs(s) / 60);
+  const sec = Math.abs(s) % 60;
+  return (s < 0 ? '-' : '') + String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+}
+
+function updateTimerDisplay() {
+  document.getElementById('time-display').textContent = formatTime(state.timer.seconds);
+}
+
+// ══════════════════════════════════════════
+//  TIMER LOCAL (continue de tourner entre deux polls)
+// ══════════════════════════════════════════
+function startLocalTimer() {
+  if (_timerInterval) return;
+  _timerInterval = setInterval(() => {
+    state.timer.seconds += state.timer.direction === 'up' ? 1 : -1;
+    updateTimerDisplay();
+  }, 1000);
+}
+
+function stopLocalTimer() {
+  clearInterval(_timerInterval);
+  _timerInterval = null;
+}
+
+function applyTimerState() {
+  stopLocalTimer();
+  if (state.timer.running) {
+    const elapsed = Math.floor((Date.now() - state.timer.lastSync) / 1000);
+    state.timer.seconds += state.timer.direction === 'up' ? elapsed : -elapsed;
+    state.timer.lastSync = Date.now();
+    startLocalTimer();
+  }
+  updateTimerDisplay();
+}
+
+// ══════════════════════════════════════════
+//  GOAL FLASH / TICKER / TIMEOUT
+// ══════════════════════════════════════════
+function showGoalFlash(teamName) {
+  document.getElementById('goal-flash-team').textContent = teamName;
+  const el = document.getElementById('goal-flash');
+  el.classList.add('show');
+  clearTimeout(_goalFlashTO);
+  _goalFlashTO = setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+function showTicker(msg, duration = 4000) {
+  const el = document.getElementById('event-ticker');
+  el.textContent = msg;
+  el.classList.add('visible');
+  clearTimeout(_tickerTO);
+  _tickerTO = setTimeout(() => el.classList.remove('visible'), duration);
+}
+
+function startTimeoutBanner(teamName) {
+  clearInterval(_timeoutInterval);
+  _timeoutSeconds = 60;
+  document.getElementById('timeout-team').textContent  = teamName;
+  document.getElementById('timeout-timer').textContent = '1:00';
+  document.getElementById('timeout-banner').classList.add('visible');
+  _timeoutInterval = setInterval(() => {
+    _timeoutSeconds--;
+    document.getElementById('timeout-timer').textContent = formatTime(_timeoutSeconds);
+    if (_timeoutSeconds <= 0) endTimeoutBanner();
+  }, 1000);
+}
+
+function endTimeoutBanner() {
+  clearInterval(_timeoutInterval);
+  document.getElementById('timeout-banner').classList.remove('visible');
+}
+
+// ══════════════════════════════════════════
+//  DÉTECTION D'ÉVÉNEMENTS PAR COMPARAISON D'ÉTAT
+//  (puisqu'on ne reçoit que des "snapshots", pas des
+//  actions, on déduit les effets visuels en comparant
+//  l'ancien et le nouvel état)
+// ══════════════════════════════════════════
+function detectAndAnimate(prev, next) {
+  if (next.homeScore > prev.homeScore) { showGoalFlash(next.homeName); showTicker('⚽ BUT – ' + next.homeName); }
+  if (next.awayScore > prev.awayScore) { showGoalFlash(next.awayName); showTicker('⚽ BUT – ' + next.awayName); }
+
+  const sanctionTypes = ['yellow','red','blue','white','min2'];
+  const labels = { yellow:'Carton jaune', red:'Carton rouge', blue:'Carton bleu', white:'Disqualification', min2:'Suspension 2 min' };
+  sanctionTypes.forEach(t => {
+    if ((next.homeSanctions?.[t] || 0) > (prev.homeSanctions?.[t] || 0)) showTicker(labels[t] + ' – ' + next.homeName);
+    if ((next.awaySanctions?.[t] || 0) > (prev.awaySanctions?.[t] || 0)) showTicker(labels[t] + ' – ' + next.awayName);
+  });
+
+  if (next.period !== prev.period) {
+    const periodLabels = { 1: '1ère mi-temps', 2: '2ème mi-temps', 3: 'Prolongation' };
+    showTicker('🕐 ' + (periodLabels[next.period] || ''));
+  }
+
+  if (next.timeoutActive && !prev.timeoutActive) {
+    // On ne connaît pas l'équipe exacte depuis le diff seul ; on relance
+    // simplement le bandeau avec la dernière équipe connue si dispo.
+    // (Affichage du temps mort lui-même reste piloté par timeoutActive.)
+  }
+}
+
+// ══════════════════════════════════════════
+//  POLLING
+// ══════════════════════════════════════════
+function randomDelay() {
+  return 3000 + Math.random() * 2000; // entre 3 et 5 secondes
+}
+
+function setSyncDot(ok) {
+  const dot = document.getElementById('sync-dot');
+  dot.classList.remove('ok','fail');
+  dot.classList.add(ok ? 'ok' : 'fail');
+}
+
+async function pollOnce() {
+  try {
+    const remote = await githubFetchState();
+    setSyncDot(true);
+    if (remote === null) return; // fichier pas encore créé côté control.html
+
+    if ((remote.rev || 0) !== _lastRev) {
+      const prev = state;
+      detectAndAnimate(prev, remote);
+      state = remote;
+      _lastRev = remote.rev || 0;
+      applyTimerState();
+      render();
+    }
+  } catch (e) {
+    console.warn('[Overlay] Échec lecture GitHub', e);
+    setSyncDot(false);
+  }
+}
+
+function startPolling() {
+  stopPolling();
+  const loop = async () => {
+    await pollOnce();
+    _pollTimer = setTimeout(loop, randomDelay());
+  };
+  loop();
+}
+
+function stopPolling() {
+  if (_pollTimer) clearTimeout(_pollTimer);
+  _pollTimer = null;
+}
+
+// ══════════════════════════════════════════
+//  ÉCRAN DE CONFIGURATION
+// ══════════════════════════════════════════
+function showConfigOverlay(show) {
+  document.getElementById('config-overlay').style.display = show ? 'flex' : 'none';
+}
+
+document.getElementById('btn-save-config').addEventListener('click', async () => {
+  cfg.repo   = document.getElementById('cfg-repo').value.trim();
+  cfg.branch = document.getElementById('cfg-branch').value.trim() || 'main';
+  cfg.path   = document.getElementById('cfg-path').value.trim() || 'mhbtv-match-state.json';
+  cfg.token  = document.getElementById('cfg-token').value.trim();
+
+  const errEl = document.getElementById('config-error');
+  if (!cfg.repo || !cfg.token) {
+    errEl.textContent = '⚠ Repo et token sont obligatoires.';
+    return;
+  }
+
+  errEl.textContent = 'Connexion en cours…';
+  try {
+    const remote = await githubFetchState();
+    saveConfig();
+    if (remote) {
+      state = remote;
+      _lastRev = remote.rev || 0;
+      applyTimerState();
+      render();
+    }
+    showConfigOverlay(false);
+    startPolling();
+  } catch (e) {
+    errEl.textContent = '⚠ ' + e.message;
+  }
+});
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+loadConfig();
+document.getElementById('cfg-repo').value   = cfg.repo;
+document.getElementById('cfg-branch').value = cfg.branch || 'main';
+document.getElementById('cfg-path').value   = cfg.path || 'mhbtv-match-state.json';
+document.getElementById('cfg-token').value  = cfg.token;
+
+render();
+updateTimerDisplay();
+
+if (configReady()) {
+  showConfigOverlay(false);
+  pollOnce().then(() => startPolling());
+} else {
+  showConfigOverlay(true);
+}
+</script>
+</body>
+</html>
