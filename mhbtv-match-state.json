@@ -2,7 +2,7 @@
   "homeName": "DOMICILE",
   "awayName": "EXTÉRIEUR",
   "homeScore": 0,
-  "awayScore": 1,
+  "awayScore": 0,
   "homeSanctions": {
     "yellow": 0,
     "red": 0,
@@ -26,7 +26,7 @@
   "period": 1,
   "timeoutActive": false,
   "visible": true,
-  "rev": 14,
-  "updatedBy": "client_scyke28i",
-  "updatedAt": 1782077560169
+  "rev": 15,
+  "updatedBy": "control_zpa2gntt",
+  "updatedAt": 1782077641579
 }
