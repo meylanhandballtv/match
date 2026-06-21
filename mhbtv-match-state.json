@@ -1,6 +1,6 @@
 {
-  "homeName": "DOMICILE",
-  "awayName": "EXTÉRIEUR",
+  "homeName": "MEYLAN",
+  "awayName": "GSMH",
   "homeScore": 0,
   "awayScore": 0,
   "homeSanctions": {
@@ -26,7 +26,7 @@
   "period": 1,
   "timeoutActive": true,
   "visible": true,
-  "rev": 20,
+  "rev": 21,
   "updatedBy": "control_zpa2gntt",
-  "updatedAt": 1782077883462
+  "updatedAt": 1782077920929
 }
