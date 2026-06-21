@@ -19,14 +19,14 @@
   },
   "timer": {
     "running": false,
-    "seconds": 124,
+    "seconds": 146,
     "direction": "up",
-    "lastSync": 1782078017718
+    "lastSync": 1782079971870
   },
   "period": 1,
   "timeoutActive": true,
   "visible": true,
-  "rev": 24,
+  "rev": 26,
   "updatedBy": "control_n6oobsul",
-  "updatedAt": 1782079919794
+  "updatedAt": 1782079994574
 }
