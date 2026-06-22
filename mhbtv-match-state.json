@@ -4,7 +4,7 @@
   "homeScore": 0,
   "awayScore": 0,
   "homeSanctions": {
-    "yellow": 1,
+    "yellow": 0,
     "red": 0,
     "blue": 0,
     "white": 0,
@@ -21,12 +21,12 @@
     "running": false,
     "seconds": 0,
     "direction": "up",
-    "lastSync": 1782133765379
+    "lastSync": 1782133840428
   },
   "period": 1,
-  "timeoutActive": true,
+  "timeoutActive": false,
   "visible": true,
-  "rev": 43,
-  "updatedBy": "control_32lko6g0",
-  "updatedAt": 1782133770216
+  "rev": 44,
+  "updatedBy": "control_penk23p5",
+  "updatedAt": 1782133840429
 }
