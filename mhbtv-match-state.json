@@ -24,9 +24,9 @@
     "lastSync": 1782133927154
   },
   "period": 1,
-  "timeoutActive": false,
+  "timeoutActive": true,
   "visible": true,
-  "rev": 46,
+  "rev": 47,
   "updatedBy": "control_penk23p5",
-  "updatedAt": 1782133958656
+  "updatedAt": 1782134062056
 }
